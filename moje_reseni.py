@@ -23,11 +23,11 @@ plt.gca().set_xlabel('$t[s]$')
 plt.gca().set_title('Vstupný zvukový signál')
 plt.tight_layout()
 
+# uloženie vstupného signálu
 sig_old = sig
 
 plt.savefig("uloha4-1.png")
 plt.show()
-
 
 ### Úloha 4.2
 pos = 0
@@ -45,7 +45,6 @@ plt.gca().set_xlabel('$t[s]$')
 plt.gca().set_title("Znelý rámec")
 plt.savefig("uloha4-2.png")
 plt.show()
-
 
 ### Úloha 4.3
 def frame_dft(s_input):
@@ -103,46 +102,10 @@ cos3 = np.cos(2 * np.pi * 2760 * casove_useky)
 cos4 = np.cos(2 * np.pi * 3680 * casove_useky)
 
 cos_merge = cos1 + cos2 + cos3 + cos4
-wavfile.write("4cos.wav", fs, cos_merge.astype(np.float32))
+wavfile.write("audio/4cos.wav", fs, cos_merge.astype(np.float32))
 
-"""
-# Kontrola vygenerovaného signálu
-wavfile.write("4cos.wav", fs, cos_merge.astype(np.float32))
-sig_cos, fs_cos = sf.read("xsehno01.wav")
-pocet_vzorkov = len(sig_cos)
-cas = pocet_vzorkov / fs_cos
-print("Vzorkovacia frekvencia signálu: {} [Hz]".format(fs))
-print("Dĺžka signálu vo vzorkách:", pocet_vzorkov)
-print("Dĺžka signálu v sekundách: {} [s]".format(cas))
-print("Minimálna hodnota:", sig.min())
-print("Maximálna hodnota:", sig.max())
-
-f, t, sgr = spectrogram(sig_cos, fs_cos)
-# prevod na PSD
-# (ve spektrogramu se obcas objevuji nuly, ktere se nelibi logaritmu, proto +1e-20)
-sgr_log = 10 * np.log10(sgr+1e-20)
-plt.figure(figsize=(6, 3))
-plt.pcolormesh(t, f, sgr_log) #sqr_log
-plt.gca().set_title("Spektogram generovaného signálu")
-plt.gca().set_xlabel('Čas [s]')
-plt.gca().set_ylabel('Frekvence [Hz]')
-cbar = plt.colorbar()
-cbar.set_label('Spektralní hustota výkonu [dB]', rotation=270, labelpad=15)
-
-plt.tight_layout()
-plt.savefig("uloha4-6.png")
-plt.show()
-
-# Dalsi sposob zobrazenia spektogramu
-plt.specgram(sig_cos, Fs=fs_cos)
-cbar = plt.colorbar()
-plt.tight_layout()
-plt.show()
-"""
-
-### Úloha 4.7 - Čislicový filter
-
-# 3. návrh 4 pásmových zádrží
+### Úloha 4.7 - Čistiaci filter
+# metóda č.3 - návrh 4 pásmových zádrží
 low = 890 / (0.5 * fs)
 high = 950 / (0.5 * fs)
 b1, a1 = butter(4, [low, high], btype="bandstop")
@@ -163,7 +126,7 @@ high = 3710 / (0.5 * fs)
 b4, a4 = butter(4, [low, high], btype="bandstop")
 z4, p4, k4 = butter(4, [low, high], btype="bandstop", output="zpk")
 
-# impulsni odezva
+# impulzná odozva
 imp = [1, *np.zeros(pocet_vzorkov-1)]
 h1 = lfilter(b1, a1, imp[:50])
 h2 = lfilter(b2, a2, imp[:50])
@@ -172,22 +135,22 @@ h4 = lfilter(b4, a4, imp[:50])
 
 fig, ax = plt.subplots(2, 2, figsize=(10, 5))
 
-ax[0][0].set_title('Impulzná odezva pre f1 $h[n]$')
+ax[0][0].set_title('Impulzná odozva pre f1 $h[n]$')
 ax[0][0].stem(np.arange(50), h1, basefmt=' ')
 ax[0][0].set_xlabel('$n$')
 ax[0][0].grid(alpha=0.5, linestyle='--')
 
-ax[1][0].set_title('Impulzná odezva pre f2 $h[n]$')
+ax[1][0].set_title('Impulzná odozva pre f2 $h[n]$')
 ax[1][0].stem(np.arange(50), h2, basefmt=' ')
 ax[1][0].set_xlabel('$n$')
 ax[1][0].grid(alpha=0.5, linestyle='--')
 
-ax[0][1].set_title('Impulzná odezva pre f3 $h[n]$')
+ax[0][1].set_title('Impulzná odozva pre f3 $h[n]$')
 ax[0][1].stem(np.arange(50), h3, basefmt=' ')
 ax[0][1].set_xlabel('$n$')
 ax[0][1].grid(alpha=0.5, linestyle='--')
 
-ax[1][1].set_title('Impulzná odezva pre f4 $h[n]$')
+ax[1][1].set_title('Impulzná odozva pre f4 $h[n]$')
 ax[1][1].stem(np.arange(50), h4, basefmt=' ')
 ax[1][1].set_xlabel('$n$')
 ax[1][1].grid(alpha=0.5, linestyle='--')
@@ -198,14 +161,13 @@ plt.tight_layout()
 plt.show()
 
 ### Úloha 4.8 - Nulové body a póly
+plt.figure(figsize=(4, 3.5))
 
-plt.figure(figsize=(4,3.5))
-
-# jednotkova kruznice
+# jednotková kružnica
 ang = np.linspace(0, 2*np.pi,100)
 plt.plot(np.cos(ang), np.sin(ang))
 
-# nuly, poly
+# nuly, póly
 plt.scatter(np.real(z1), np.imag(z1), marker='o', facecolors='none', edgecolors='r', label='nuly')
 plt.scatter(np.real(p1), np.imag(p1), marker='x', color='g', label='póly')
 plt.scatter(np.real(z2), np.imag(z2), marker='o', facecolors='none', edgecolors='r')
@@ -231,7 +193,7 @@ freq2, h2 = freqz(b2, a2)
 freq3, h3 = freqz(b3, a3)
 freq4, h4 = freqz(b4, a4)
 
-# Plot
+# plot
 fig, ax = plt.subplots(1, 2, figsize=(10, 5))
 ax[0].plot(freq1 / 2 / np.pi * fs, np.abs(h1), color='blue')
 ax[0].plot(freq2 / 2 / np.pi * fs, np.abs(h2), color='red')
@@ -253,18 +215,17 @@ plt.savefig("uloha4-9.png")
 plt.show()
 
 ### Úloha 4.10 - Filtrácia
-
-sig = lfilter(b1, a1, sig) #filtfilt
+# filtrovanie signálu
+sig = lfilter(b1, a1, sig)
 sig = lfilter(b2, a2, sig)
 sig = lfilter(b3, a3, sig)
 sig = lfilter(b4, a4, sig)
 
-wavfile.write("clean_bandstop.wav", fs, sig.astype(np.float32))
+# vytvorenie výsledného zvuku
+wavfile.write("audio/clean_bandstop.wav", fs, sig.astype(np.float32))
 
-# TODO: vymazat, iba kontrola
+# spektogram vyfiltrovaného signálu
 f, t, sgr = spectrogram(sig, fs)
-# prevod na PSD
-# (ve spektrogramu se obcas objevuji nuly, ktere se nelibi logaritmu, proto +1e-20)
 sgr_log = 10 * np.log10(sgr+1e-20)
 plt.figure(figsize=(6, 3))
 plt.pcolormesh(t, f, sgr_log)
@@ -273,11 +234,11 @@ plt.gca().set_xlabel('Čas [s]')
 plt.gca().set_ylabel('Frekvencia [Hz]')
 cbar = plt.colorbar()
 cbar.set_label('Spektralna hustota výkonu [dB]', rotation=270, labelpad=15)
-
 plt.tight_layout()
 plt.savefig("uloha4-10-1.png")
 plt.show()
 
+# porovnanie pôvodného a filtrovaného signálu
 t = np.arange(sig.size) / fs
 plt.figure(figsize=(6, 3))
 plt.plot(t, sig_old, label="vstupný signál")
