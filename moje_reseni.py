@@ -2,7 +2,6 @@ import numpy as np
 import soundfile as sf
 from scipy.io import wavfile
 import matplotlib.pyplot as plt
-import IPython
 from scipy.signal import spectrogram, lfilter, freqz, butter
 
 # Načítanie signálu a normalizácia
@@ -24,8 +23,6 @@ plt.gca().set_xlabel('$t[s]$')
 plt.gca().set_title('Vstupný zvukový signál')
 plt.tight_layout()
 
-#TODO: vymazat
-IPython.display.display(IPython.display.Audio(sig, rate=fs))
 sig_old = sig
 
 plt.savefig("uloha4-1.png")
@@ -71,8 +68,8 @@ fs_frame = fs // 2 / 512
 time = np.arange(512)*fs_frame
 plt.figure(figsize=(6, 4))
 plt.plot(time, abs(s_dft[:512]))
-plt.gca().set_title("DFT")
-plt.gca().set_xlabel('Frekvence [Hz]')
+plt.gca().set_title("Diskrétna Fourierova transformácia (DFT)")
+plt.gca().set_xlabel('Frekvencia [Hz]')
 plt.savefig("uloha4-3.png")
 plt.show()
 
@@ -82,11 +79,12 @@ f, t, sgr = spectrogram(sig, fs)
 # (ve spektrogramu se obcas objevuji nuly, ktere se nelibi logaritmu, proto +1e-20)
 sgr_log = 10 * np.log10(sgr+1e-20)
 plt.figure(figsize=(6, 3))
-plt.pcolormesh(t, f, sgr_log) #sqr_log
+plt.pcolormesh(t, f, sgr_log)
+plt.gca().set_title('Spektogram')
 plt.gca().set_xlabel('Čas [s]')
-plt.gca().set_ylabel('Frekvence [Hz]')
+plt.gca().set_ylabel('Frekvencia [Hz]')
 cbar = plt.colorbar()
-cbar.set_label('Spektralní hustota výkonu [dB]', rotation=270, labelpad=15)
+cbar.set_label('Spektrálna hustota výkonu [dB]', rotation=270, labelpad=15)
 
 plt.tight_layout()
 plt.savefig("uloha4-4.png")
@@ -174,25 +172,25 @@ h4 = lfilter(b4, a4, imp[:50])
 
 fig, ax = plt.subplots(2, 2, figsize=(10, 5))
 
-fig.gca().set_title('Impulsní odezva $h[n]$')
-
+ax[0][0].set_title('Impulzná odezva pre f1 $h[n]$')
 ax[0][0].stem(np.arange(50), h1, basefmt=' ')
 ax[0][0].set_xlabel('$n$')
 ax[0][0].grid(alpha=0.5, linestyle='--')
 
+ax[1][0].set_title('Impulzná odezva pre f2 $h[n]$')
 ax[1][0].stem(np.arange(50), h2, basefmt=' ')
 ax[1][0].set_xlabel('$n$')
 ax[1][0].grid(alpha=0.5, linestyle='--')
 
+ax[0][1].set_title('Impulzná odezva pre f3 $h[n]$')
 ax[0][1].stem(np.arange(50), h3, basefmt=' ')
 ax[0][1].set_xlabel('$n$')
 ax[0][1].grid(alpha=0.5, linestyle='--')
 
+ax[1][1].set_title('Impulzná odezva pre f4 $h[n]$')
 ax[1][1].stem(np.arange(50), h4, basefmt=' ')
 ax[1][1].set_xlabel('$n$')
 ax[1][1].grid(alpha=0.5, linestyle='--')
-
-ax[1][1].set_title('Impulsní odezva $h[n]$')
 
 plt.grid(alpha=0.5, linestyle='--')
 
@@ -217,8 +215,8 @@ plt.scatter(np.real(p3), np.imag(p3), marker='x', color='g')
 plt.scatter(np.real(z4), np.imag(z4), marker='o', facecolors='none', edgecolors='r')
 plt.scatter(np.real(p4), np.imag(p4), marker='x', color='g')
 
-plt.gca().set_xlabel('Realná složka $\mathbb{R}\{$z$\}$')
-plt.gca().set_ylabel('Imaginární složka $\mathbb{I}\{$z$\}$')
+plt.gca().set_xlabel('Realná zložka $\mathbb{R}\{$z$\}$')
+plt.gca().set_ylabel('Imaginárna zložka $\mathbb{I}\{$z$\}$')
 
 plt.grid(alpha=0.5, linestyle='--')
 plt.legend(loc='upper left')
@@ -239,15 +237,16 @@ ax[0].plot(freq1 / 2 / np.pi * fs, np.abs(h1), color='blue')
 ax[0].plot(freq2 / 2 / np.pi * fs, np.abs(h2), color='red')
 ax[0].plot(freq3 / 2 / np.pi * fs, np.abs(h3), color='yellow')
 ax[0].plot(freq4 / 2 / np.pi * fs, np.abs(h4), color='green')
-ax[0].set_title('Modul frekvenční charakteristiky $|H(e^{j\omega})|$')
+ax[0].set_title('Modul frekvenčnej charakteristiky $|H(e^{j\omega})|$')
 ax[0].set_xlabel("Frekvencia [Hz]")
 ax[0].grid(alpha=0.5, linestyle='--')
-ax[1].plot(freq1 / 2 / np.pi * fs, np.angle(h1), color='blue')
-ax[1].plot(freq2 / 2 / np.pi * fs, np.angle(h2), color='red')
-ax[1].plot(freq3 / 2 / np.pi * fs, np.angle(h3), color='yellow')
-ax[1].plot(freq4 / 2 / np.pi * fs, np.angle(h4), color='green')
-ax[1].set_title('Argument frekvenční charakteristiky $\mathrm{arg}\ H(e^{j\omega})$')
+ax[1].plot(freq1 / 2 / np.pi * fs, np.angle(h1), color='blue', label="filter pre 920 Hz")
+ax[1].plot(freq2 / 2 / np.pi * fs, np.angle(h2), color='red', label="filter pre 1840 Hz")
+ax[1].plot(freq3 / 2 / np.pi * fs, np.angle(h3), color='yellow', label="filter pre 2760 Hz")
+ax[1].plot(freq4 / 2 / np.pi * fs, np.angle(h4), color='green', label="filter pre 3680 Hz")
+ax[1].set_title('Argument frekvenčnej charakteristiky $\mathrm{arg}\ H(e^{j\omega})$')
 ax[1].set_xlabel("Frekvencia [Hz]")
+ax[1].legend(loc='upper right')
 ax[1].grid(alpha=0.5, linestyle='--')
 plt.tight_layout()
 plt.savefig("uloha4-9.png")
@@ -268,37 +267,24 @@ f, t, sgr = spectrogram(sig, fs)
 # (ve spektrogramu se obcas objevuji nuly, ktere se nelibi logaritmu, proto +1e-20)
 sgr_log = 10 * np.log10(sgr+1e-20)
 plt.figure(figsize=(6, 3))
-plt.pcolormesh(t, f, sgr_log) #sqr_log
+plt.pcolormesh(t, f, sgr_log)
+plt.gca().set_title('Spektogram vyfiltrovaného signálu')
 plt.gca().set_xlabel('Čas [s]')
-plt.gca().set_ylabel('Frekvence [Hz]')
+plt.gca().set_ylabel('Frekvencia [Hz]')
 cbar = plt.colorbar()
-cbar.set_label('Spektralní hustota výkonu [dB]', rotation=270, labelpad=15)
+cbar.set_label('Spektralna hustota výkonu [dB]', rotation=270, labelpad=15)
 
 plt.tight_layout()
+plt.savefig("uloha4-10-1.png")
 plt.show()
 
-# TODO: vymazat, iba kontrola
-s_dft = frame_dft(sig)
-fs_frame = fs // 2 / 512
-time = np.arange(512)*fs_frame
-plt.figure(figsize=(6, 4))
-plt.plot(time, abs(s_dft[:512]))
-plt.gca().set_title("DFT")
-plt.gca().set_xlabel('Frekvence [Hz]')
-plt.show()
-
-
-
-
-
-# TODO: kontrola, vymazat
 t = np.arange(sig.size) / fs
-plt.figure(figsize=(6,3))
-plt.plot(t, sig_old)
-plt.plot(t, sig)
+plt.figure(figsize=(6, 3))
+plt.plot(t, sig_old, label="vstupný signál")
+plt.plot(t, sig, label="filtrovaný signál")
 plt.gca().set_xlabel('$t[s]$')
-plt.gca().set_title('Zvukový signál')
+plt.gca().set_title('Porovnanie signálov')
+plt.legend(loc='upper left')
 plt.tight_layout()
+plt.savefig("uloha4-10-2.png")
 plt.show()
-
-
