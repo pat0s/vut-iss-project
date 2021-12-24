@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import spectrogram, lfilter, freqz, butter
 
 # Načítanie signálu a normalizácia
-sig, fs = sf.read("xsehno01.wav")
+sig, fs = sf.read("../audio/xsehno01.wav")
 
 ### Úloha 4.1
 pocet_vzorkov = len(sig)
@@ -26,7 +26,7 @@ plt.tight_layout()
 # uloženie vstupného signálu
 sig_old = sig
 
-plt.savefig("uloha4-1.png")
+#plt.savefig("../inc/uloha4-1.png")
 plt.show()
 
 ### Úloha 4.2
@@ -43,7 +43,7 @@ plt.figure(figsize=(6, 3))
 plt.plot(t, frames[24])
 plt.gca().set_xlabel('$t[s]$')
 plt.gca().set_title("Znelý rámec")
-plt.savefig("uloha4-2.png")
+#plt.savefig("../inc/uloha4-2.png")
 plt.show()
 
 ### Úloha 4.3
@@ -69,7 +69,7 @@ plt.figure(figsize=(6, 4))
 plt.plot(time, abs(s_dft[:512]))
 plt.gca().set_title("Diskrétna Fourierova transformácia (DFT)")
 plt.gca().set_xlabel('Frekvencia [Hz]')
-plt.savefig("uloha4-3.png")
+#plt.savefig("../inc/uloha4-3.png")
 plt.show()
 
 ### Úloha 4.4
@@ -86,7 +86,7 @@ cbar = plt.colorbar()
 cbar.set_label('Spektrálna hustota výkonu [dB]', rotation=270, labelpad=15)
 
 plt.tight_layout()
-plt.savefig("uloha4-4.png")
+#plt.savefig("../inc/uloha4-4.png")
 plt.show()
 
 ### Úloha 4.5 - Určenie rušivých frekvencií f1, f2, f3, f4
@@ -102,7 +102,20 @@ cos3 = np.cos(2 * np.pi * 2760 * casove_useky)
 cos4 = np.cos(2 * np.pi * 3680 * casove_useky)
 
 cos_merge = cos1 + cos2 + cos3 + cos4
-wavfile.write("audio/4cos.wav", fs, cos_merge.astype(np.float32))
+wavfile.write("../audio/4cos.wav", fs, cos_merge.astype(np.float32))
+
+f, t, sgr = spectrogram(cos_merge, fs)
+sgr_log = 10 * np.log10(sgr+1e-20)
+plt.figure(figsize=(6, 3))
+plt.pcolormesh(t, f, sgr_log)
+plt.gca().set_title('Spektogram generovaného signálu')
+plt.gca().set_xlabel('Čas [s]')
+plt.gca().set_ylabel('Frekvencia [Hz]')
+cbar = plt.colorbar()
+cbar.set_label('Spektralna hustota výkonu [dB]', rotation=270, labelpad=15)
+plt.tight_layout()
+#plt.savefig("../inc/uloha4-6.png")
+plt.show()
 
 ### Úloha 4.7 - Čistiaci filter
 # metóda č.3 - návrh 4 pásmových zádrží
@@ -125,6 +138,12 @@ low = 3650 / (0.5 * fs)
 high = 3710 / (0.5 * fs)
 b4, a4 = butter(4, [low, high], btype="bandstop")
 z4, p4, k4 = butter(4, [low, high], btype="bandstop", output="zpk")
+
+print("Koeficienty filtrov: ")
+print(b1, a1)
+print(b2, a2)
+print(b3, a3)
+print(b4, a4)
 
 # impulzná odozva
 imp = [1, *np.zeros(pocet_vzorkov-1)]
@@ -158,6 +177,7 @@ ax[1][1].grid(alpha=0.5, linestyle='--')
 plt.grid(alpha=0.5, linestyle='--')
 
 plt.tight_layout()
+#plt.savefig("../inc/uloha4-7.png")
 plt.show()
 
 ### Úloha 4.8 - Nulové body a póly
@@ -184,7 +204,7 @@ plt.grid(alpha=0.5, linestyle='--')
 plt.legend(loc='upper left')
 
 plt.tight_layout()
-plt.savefig("uloha4-8.png")
+#plt.savefig("../inc/uloha4-8.png")
 plt.show()
 
 ### Úloha 4.9 - Frekvenčná charakteristika
@@ -211,7 +231,7 @@ ax[1].set_xlabel("Frekvencia [Hz]")
 ax[1].legend(loc='upper right')
 ax[1].grid(alpha=0.5, linestyle='--')
 plt.tight_layout()
-plt.savefig("uloha4-9.png")
+#plt.savefig("../inc/uloha4-9.png")
 plt.show()
 
 ### Úloha 4.10 - Filtrácia
@@ -222,7 +242,7 @@ sig = lfilter(b3, a3, sig)
 sig = lfilter(b4, a4, sig)
 
 # vytvorenie výsledného zvuku
-wavfile.write("audio/clean_bandstop.wav", fs, sig.astype(np.float32))
+wavfile.write("../audio/clean_bandstop.wav", fs, sig.astype(np.float32))
 
 # spektogram vyfiltrovaného signálu
 f, t, sgr = spectrogram(sig, fs)
@@ -235,7 +255,7 @@ plt.gca().set_ylabel('Frekvencia [Hz]')
 cbar = plt.colorbar()
 cbar.set_label('Spektralna hustota výkonu [dB]', rotation=270, labelpad=15)
 plt.tight_layout()
-plt.savefig("uloha4-10-1.png")
+#plt.savefig("../inc/uloha4-10-1.png")
 plt.show()
 
 # porovnanie pôvodného a filtrovaného signálu
@@ -247,5 +267,5 @@ plt.gca().set_xlabel('$t[s]$')
 plt.gca().set_title('Porovnanie signálov')
 plt.legend(loc='upper left')
 plt.tight_layout()
-plt.savefig("uloha4-10-2.png")
+#plt.savefig("../inc/uloha4-10-2.png")
 plt.show()
